@@ -134,16 +134,11 @@ export default function App() {
           return newMessages;
         });
       }
-   } catch (error: any) {
-      console.error('Echter Fehler:', error);
-      // Dies zeigt den Fehler direkt im Chat an:
-      setMessages(prev => [...prev, { 
-        role: 'model', 
-        text: `❌ **Streaming-Fehler:** ${error.message || 'Unbekannter Fehler'}. Bitte versuche die Seite neu zu laden.` 
-      }]);
-    } finally {
-      setIsLoading(false);
-    }
+    } catch (error) {
+      console.error('Failed to send message:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleScenarioSelect = (scenarios: any, type: string, label: string) => {
@@ -221,7 +216,7 @@ export default function App() {
           >
             <Dumbbell className="w-3 h-3 sm:w-4 sm:h-4 text-sky-500" />
             <span className="text-[10px] sm:text-xs font-semibold text-sky-700 whitespace-nowrap">
-              P: {stats.protein === 'unbekannt' ? '--' : `${stats.protein}gg`}
+              P: {stats.protein === 'unbekannt' ? '--' : `${stats.protein}g`}
             </span>
           </motion.div>
           <motion.div 
