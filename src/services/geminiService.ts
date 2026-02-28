@@ -74,19 +74,23 @@ export class GeminiService {
   private chat: any;
 
   constructor() {
-    const apiKey = process.env.GEMINI_API_KEY;
+    // WICHTIG: In VITE Projekten muss es import.meta.env sein, 
+    // außer du nutzt ein spezielles Backend-Plugin.
+    const apiKey = import.meta.env.VITE_GEMINI_API_KEY || process.env.GEMINI_API_KEY;
+    
     if (!apiKey) {
       throw new Error("GEMINI_API_KEY is not set");
     }
     this.ai = new GoogleGenAI({ apiKey });
+    
+    // KORREKTUR: Modellname auf das stabile Standard-Modell ändern
     this.chat = this.ai.chats.create({
-      model: "gemini-3-flash-preview",
+      model: "gemini-1.5-flash", 
       config: {
         systemInstruction: SYSTEM_INSTRUCTION,
       },
     });
   }
-
   async sendMessage(message: string): Promise<string> {
     try {
       const result = await this.chat.sendMessage({ message });
