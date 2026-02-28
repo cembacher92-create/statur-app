@@ -74,23 +74,22 @@ export class GeminiService {
   private chat: any;
 
   constructor() {
-    // WICHTIG: In VITE Projekten muss es import.meta.env sein, 
-    // außer du nutzt ein spezielles Backend-Plugin.
-    const apiKey = import.meta.env.VITE_GEMINI_API_KEY || process.env.GEMINI_API_KEY;
-    
-    if (!apiKey) {
-      throw new Error("GEMINI_API_KEY is not set");
-    }
-    this.ai = new GoogleGenAI({ apiKey });
-    
-    // KORREKTUR: Modellname auf das stabile Standard-Modell ändern
-    this.chat = this.ai.chats.create({
-      model: "gemini-1.5-flash", 
-      config: {
-        systemInstruction: SYSTEM_INSTRUCTION,
-      },
-    });
+  // Versuche beide Wege, da Vite 'import.meta.env' bevorzugt
+  const apiKey = import.meta.env.VITE_GEMINI_API_KEY || process.env.GEMINI_API_KEY;
+  
+  if (!apiKey) {
+    // Wenn das hier im Browser-Log erscheint, fehlt die Umgebungsvariable
+    console.error("API Key fehlt!");
+    throw new Error("GEMINI_API_KEY is not set");
   }
+
+  this.ai = new GoogleGenAI(apiKey); // Manchmal benötigt das SDK nur den String
+  
+  this.chat = this.ai.getGenerativeModel({ 
+    model: "gemini-1.5-flash", // Nutze ein stabileres Modell statt preview
+    systemInstruction: SYSTEM_INSTRUCTION 
+  }).startChat();
+}
   async sendMessage(message: string): Promise<string> {
     try {
       const result = await this.chat.sendMessage({ message });
