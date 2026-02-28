@@ -221,7 +221,7 @@ export default function App() {
           >
             <Dumbbell className="w-3 h-3 sm:w-4 sm:h-4 text-sky-500" />
             <span className="text-[10px] sm:text-xs font-semibold text-sky-700 whitespace-nowrap">
-              P: {stats.protein === 'unbekannt' ? '--' : `${stats.protein}g`}
+              P: {stats.protein === 'unbekannt' ? '--' : `${stats.protein}gg`}
             </span>
           </motion.div>
           <motion.div 
