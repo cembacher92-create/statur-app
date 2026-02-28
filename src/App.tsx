@@ -134,11 +134,16 @@ export default function App() {
           return newMessages;
         });
       }
-    } catch (error) {
-      console.error('Failed to send message:', error);
-    } finally {
-      setIsLoading(false);
-    }
+   } catch (error: any) {
+      console.error('Echter Fehler:', error);
+      // Dies zeigt den Fehler direkt im Chat an:
+      setMessages(prev => [...prev, { 
+        role: 'model', 
+        text: `❌ **Streaming-Fehler:** ${error.message || 'Unbekannter Fehler'}. Bitte versuche die Seite neu zu laden.` 
+      }]);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleScenarioSelect = (scenarios: any, type: string, label: string) => {
