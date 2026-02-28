@@ -1,4 +1,4 @@
-import { GoogleGenAI } from "@google/generative-ai";
+import { GoogleGenAI, GenerateContentResponse } from "@google/genai";
 
 const SYSTEM_INSTRUCTION = `# ROLLE: STATUR
 Du bist STATUR, ein exklusiver, hochintelligenter Mentor für biologische Architektur. Deine Kommunikation ist direkt, analytisch, präzise und nutzt ein gehobenes Deutsch. Du bist kein "Fitness-Kumpel", sondern ein Mentor, der sich ausschließlich auf biologische Wahrheiten und Daten konzentriert.
@@ -74,55 +74,42 @@ export class GeminiService {
   private chat: any;
 
   constructor() {
-    // Greift auf die Vercel-Variable mit dem korrekten Vite-Präfix zu
-    const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+    // Vite braucht import.meta.env
+    const apiKey = import.meta.env.VITE_GEMINI_API_KEY || "";
     
     if (!apiKey) {
-      console.error("STATUR-Fehler: VITE_GEMINI_API_KEY ist nicht definiert.");
-      throw new Error("API Key fehlt in der Umgebung.");
+      console.error("API Key fehlt!");
     }
 
-    this.ai = new GoogleGenAI(apiKey);
+    this.ai = new GoogleGenAI({ apiKey });
     
-    // Initialisierung des Modells und des Chat-Verlaufs
-    const model = this.ai.getGenerativeModel({ 
+    this.chat = this.ai.chats.create({
       model: "gemini-1.5-flash",
-      systemInstruction: SYSTEM_INSTRUCTION 
-    });
-
-    this.chat = model.startChat({
-      history: [],
-      generationConfig: {
-        maxOutputTokens: 1000,
+      config: {
+        systemInstruction: SYSTEM_INSTRUCTION,
       },
     });
   }
 
   async sendMessage(message: string): Promise<string> {
     try {
-      const result = await this.chat.sendMessage(message);
-      const response = await result.response;
-      return response.text() || "Keine Antwort erhalten.";
+      const result = await this.chat.sendMessage({ message });
+      return result.text || "Keine Antwort erhalten.";
     } catch (error: any) {
       console.error("Error sending message to Gemini:", error);
-      return "Fehler bei der Kommunikation. Bitte versuche es später erneut.";
+      return "Fehler bei der Kommunikation mit der KI.";
     }
   }
 
   async *sendMessageStream(message: string) {
     try {
-      const result = await this.chat.sendMessageStream(message);
-      for await (const chunk of result.stream) {
-        const chunkText = chunk.text();
-        yield chunkText;
+      const result = await this.chat.sendMessageStream({ message });
+      for await (const chunk of result) {
+        yield (chunk as GenerateContentResponse).text || "";
       }
     } catch (error: any) {
-      console.error("Streaming-Fehler:", error);
-      if (error.message?.includes("500") || error.message?.includes("INTERNAL")) {
-        yield " [STATUR-Serverfehler. Google braucht kurz Pause. Bitte erneut senden.]";
-      } else {
-        yield " [Fehler beim Streamen der Antwort.]";
-      }
+      console.error("Error streaming message from Gemini:", error);
+      yield " [Fehler beim Streamen der Antwort.]";
     }
   }
 }
