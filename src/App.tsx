@@ -196,52 +196,59 @@ export default function App() {
           </div>
         </div>
         
-        <div className="grid grid-cols-2 sm:flex sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
-          <motion.div 
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
-            className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 bg-sky-50 rounded-xl border border-sky-100 shadow-sm justify-center sm:justify-start"
-          >
-            <Flame className="w-3 h-3 sm:w-4 sm:h-4 text-sky-500" />
-            <span className="text-[10px] sm:text-xs font-semibold text-sky-700 whitespace-nowrap">
-              Kcal: {stats.calories === 'unbekannt' ? '--' : stats.calories}
-            </span>
-          </motion.div>
-          <motion.div 
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.3, ease: "easeOut" }}
-            className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 bg-sky-50 rounded-xl border border-sky-100 shadow-sm justify-center sm:justify-start"
-          >
-            <Dumbbell className="w-3 h-3 sm:w-4 sm:h-4 text-sky-500" />
-            <span className="text-[10px] sm:text-xs font-semibold text-sky-700 whitespace-nowrap">
-              P: {stats.protein === 'unbekannt' ? '--' : `${stats.protein}g`}
-            </span>
-          </motion.div>
-          <motion.div 
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.4, ease: "easeOut" }}
-            className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 bg-sky-50 rounded-xl border border-sky-100 shadow-sm justify-center sm:justify-start"
-          >
-            <Info className="w-3 h-3 sm:w-4 sm:h-4 text-sky-500" />
-            <span className="text-[10px] sm:text-xs font-semibold text-sky-700 whitespace-nowrap">
-              KH: {stats.carbs === 'unbekannt' ? '--' : `${stats.carbs}g`}
-            </span>
-          </motion.div>
-          <motion.div 
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.5, ease: "easeOut" }}
-            className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 bg-sky-50 rounded-xl border border-sky-100 shadow-sm justify-center sm:justify-start"
-          >
-            <div className="w-3 h-3 sm:w-4 sm:h-4 rounded-full border-2 border-sky-500" />
-            <span className="text-[10px] sm:text-xs font-semibold text-sky-700 whitespace-nowrap">
-              F: {stats.fat === 'unbekannt' ? '--' : `${stats.fat}g`}
-            </span>
-          </motion.div>
-        </div>
+       <div className="grid grid-cols-2 sm:flex sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
+  {/* Kcal Anzeige */}
+  <motion.div 
+    initial={{ opacity: 0, y: -20 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
+    className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 bg-sky-50 rounded-xl border border-sky-100 shadow-sm justify-center sm:justify-start"
+  >
+    <Flame className="w-3 h-3 sm:w-4 sm:h-4 text-sky-500" />
+    <span className="text-[10px] sm:text-xs font-semibold text-sky-700 whitespace-nowrap">
+      Kcal: {stats.calories === 'unbekannt' ? '--' : `${stats.calories} ${Number(stats.calories) < 0 ? 'Limit überschritten' : 'verbleibend'}`}
+    </span>
+  </motion.div>
+
+  {/* Protein Anzeige */}
+  <motion.div 
+    initial={{ opacity: 0, y: -20 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.8, delay: 0.3, ease: "easeOut" }}
+    className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 bg-sky-50 rounded-xl border border-sky-100 shadow-sm justify-center sm:justify-start"
+  >
+    <Dumbbell className="w-3 h-3 sm:w-4 sm:h-4 text-sky-500" />
+    <span className="text-[10px] sm:text-xs font-semibold text-sky-700 whitespace-nowrap">
+      P: {stats.protein === 'unbekannt' ? '--' : `${stats.protein}g ${Number(stats.protein) < 0 ? 'Überschuss' : 'verbleibend'}`}
+    </span>
+  </motion.div>
+
+  {/* KH Anzeige */}
+  <motion.div 
+    initial={{ opacity: 0, y: -20 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.8, delay: 0.4, ease: "easeOut" }}
+    className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 bg-sky-50 rounded-xl border border-sky-100 shadow-sm justify-center sm:justify-start"
+  >
+    <Info className="w-3 h-3 sm:w-4 sm:h-4 text-sky-500" />
+    <span className="text-[10px] sm:text-xs font-semibold text-sky-700 whitespace-nowrap">
+      KH: {stats.carbs === 'unbekannt' ? '--' : `${stats.carbs}g ${Number(stats.carbs) < 0 ? 'Überschuss' : 'verbleibend'}`}
+    </span>
+  </motion.div>
+
+  {/* Fett Anzeige */}
+  <motion.div 
+    initial={{ opacity: 0, y: -20 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.8, delay: 0.5, ease: "easeOut" }}
+    className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 bg-sky-50 rounded-xl border border-sky-100 shadow-sm justify-center sm:justify-start"
+  >
+    <div className="w-3 h-3 sm:w-4 sm:h-4 rounded-full border-2 border-sky-500" />
+    <span className="text-[10px] sm:text-xs font-semibold text-sky-700 whitespace-nowrap">
+      F: {stats.fat === 'unbekannt' ? '--' : `${stats.fat}g ${Number(stats.fat) < 0 ? 'Überschuss' : 'verbleibend'}`}
+    </span>
+  </motion.div>
+</div>
 
         <div className="hidden sm:flex items-center gap-2">
           <button 
