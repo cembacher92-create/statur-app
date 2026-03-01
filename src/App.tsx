@@ -22,9 +22,22 @@ export default function App() {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
+  const [viewportHeight, setViewportHeight] = useState('100dvh');
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    const handleVisualViewportResize = () => {
+      if (window.visualViewport) {
+        setViewportHeight(`${window.visualViewport.height}px`);
+      }
+    };
+
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', handleVisualViewportResize);
+      window.visualViewport.addEventListener('scroll', handleVisualViewportResize);
+      handleVisualViewportResize();
+    }
+
     const fetchLogo = async () => {
       const url = await generateLogo();
       setLogoUrl(url);
@@ -42,7 +55,13 @@ export default function App() {
       setShowInitialMessage(true);
     }, 1000);
 
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(timer);
+      if (window.visualViewport) {
+        window.visualViewport.removeEventListener('resize', handleVisualViewportResize);
+        window.visualViewport.removeEventListener('scroll', handleVisualViewportResize);
+      }
+    };
   }, []);
 
   const scrollToBottom = () => {
@@ -164,9 +183,12 @@ export default function App() {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-[#fcfcfc] text-zinc-900 font-sans selection:bg-sky-500/20">
+    <div 
+      className="flex flex-col bg-[#fcfcfc] text-zinc-900 font-sans selection:bg-sky-500/20 overflow-hidden overscroll-none"
+      style={{ height: viewportHeight }}
+    >
       {/* Status Bar */}
-      <header className="flex flex-col sm:flex-row items-center justify-between px-4 sm:px-6 py-3 sm:py-4 bg-white border-b border-zinc-100 shadow-sm sticky top-0 z-10 gap-3 sm:gap-0">
+      <header className="flex flex-col sm:flex-row items-center justify-between px-3 sm:px-6 py-2 sm:py-4 bg-white border-b border-zinc-100 shadow-sm z-10 gap-2 sm:gap-0">
         <div className="flex items-center justify-between w-full sm:w-auto">
           <motion.div 
             initial={{ opacity: 0, y: -20 }}
@@ -196,15 +218,15 @@ export default function App() {
           </div>
         </div>
         
-        <div className="grid grid-cols-2 sm:flex sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
+        <div className="grid grid-cols-2 sm:flex sm:items-center gap-1 sm:gap-3 w-full sm:w-auto">
           <motion.div 
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
-            className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 bg-sky-50 rounded-xl border border-sky-100 shadow-sm justify-center sm:justify-start"
+            className="flex items-center gap-1 px-2 py-1 sm:px-4 sm:py-2 bg-sky-50 rounded-lg sm:rounded-xl border border-sky-100 shadow-sm justify-center sm:justify-start"
           >
-            <Flame className="w-3 h-3 sm:w-4 sm:h-4 text-sky-500" />
-            <span className="text-[10px] sm:text-xs font-semibold text-sky-700 whitespace-nowrap">
+            <Flame className="w-3 h-3 sm:w-4 sm:h-4 text-sky-500 flex-shrink-0" />
+            <span className="text-[8px] sm:text-xs font-bold text-sky-700 truncate">
               Kcal: {stats.calories === 'unbekannt' ? '--' : stats.calories}
             </span>
           </motion.div>
@@ -212,10 +234,10 @@ export default function App() {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.3, ease: "easeOut" }}
-            className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 bg-sky-50 rounded-xl border border-sky-100 shadow-sm justify-center sm:justify-start"
+            className="flex items-center gap-1 px-2 py-1 sm:px-4 sm:py-2 bg-sky-50 rounded-lg sm:rounded-xl border border-sky-100 shadow-sm justify-center sm:justify-start"
           >
-            <Dumbbell className="w-3 h-3 sm:w-4 sm:h-4 text-sky-500" />
-            <span className="text-[10px] sm:text-xs font-semibold text-sky-700 whitespace-nowrap">
+            <Dumbbell className="w-3 h-3 sm:w-4 sm:h-4 text-sky-500 flex-shrink-0" />
+            <span className="text-[8px] sm:text-xs font-bold text-sky-700 truncate">
               P: {stats.protein === 'unbekannt' ? '--' : `${stats.protein}g`}
             </span>
           </motion.div>
@@ -223,10 +245,10 @@ export default function App() {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4, ease: "easeOut" }}
-            className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 bg-sky-50 rounded-xl border border-sky-100 shadow-sm justify-center sm:justify-start"
+            className="flex items-center gap-1 px-2 py-1 sm:px-4 sm:py-2 bg-sky-50 rounded-lg sm:rounded-xl border border-sky-100 shadow-sm justify-center sm:justify-start"
           >
-            <Info className="w-3 h-3 sm:w-4 sm:h-4 text-sky-500" />
-            <span className="text-[10px] sm:text-xs font-semibold text-sky-700 whitespace-nowrap">
+            <Info className="w-3 h-3 sm:w-4 sm:h-4 text-sky-500 flex-shrink-0" />
+            <span className="text-[8px] sm:text-xs font-bold text-sky-700 truncate">
               KH: {stats.carbs === 'unbekannt' ? '--' : `${stats.carbs}g`}
             </span>
           </motion.div>
@@ -234,10 +256,10 @@ export default function App() {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.5, ease: "easeOut" }}
-            className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 bg-sky-50 rounded-xl border border-sky-100 shadow-sm justify-center sm:justify-start"
+            className="flex items-center gap-1 px-2 py-1 sm:px-4 sm:py-2 bg-sky-50 rounded-lg sm:rounded-xl border border-sky-100 shadow-sm justify-center sm:justify-start"
           >
-            <div className="w-3 h-3 sm:w-4 sm:h-4 rounded-full border-2 border-sky-500" />
-            <span className="text-[10px] sm:text-xs font-semibold text-sky-700 whitespace-nowrap">
+            <div className="w-3 h-3 sm:w-4 sm:h-4 rounded-full border-2 border-sky-500 flex-shrink-0" />
+            <span className="text-[8px] sm:text-xs font-bold text-sky-700 truncate">
               F: {stats.fat === 'unbekannt' ? '--' : `${stats.fat}g`}
             </span>
           </motion.div>
@@ -281,8 +303,8 @@ export default function App() {
                       )
                     )}
                   </div>
-                  <div className={`space-y-2 ${msg.role === 'user' ? 'text-right' : 'text-left'}`}>
-                    <div className={`inline-block px-5 py-3.5 rounded-2xl text-[15px] leading-relaxed shadow-sm ${
+                  <div className={`space-y-2 min-w-0 flex-1 ${msg.role === 'user' ? 'text-right' : 'text-left'}`}>
+                    <div className={`inline-block px-4 py-3 rounded-2xl text-[14px] sm:text-[15px] leading-relaxed shadow-sm break-words overflow-hidden ${
                       msg.role === 'user' 
                         ? 'bg-white text-zinc-800 rounded-tr-none border border-zinc-200' 
                         : 'bg-sky-50/50 text-zinc-900 rounded-tl-none border border-sky-200/30'
@@ -335,15 +357,15 @@ export default function App() {
       </main>
 
       {/* Input Area */}
-      <footer className="p-4 sm:p-8 bg-white border-t border-zinc-100 sticky bottom-0 z-10">
-        <div className="max-w-3xl mx-auto">
+      <footer className="p-2 sm:p-8 bg-white border-t border-zinc-100 z-10 pb-safe flex-shrink-0">
+        <div className="max-w-3xl mx-auto w-full">
           <div className="relative flex items-center bg-zinc-50 border border-zinc-200 rounded-2xl overflow-hidden focus-within:border-sky-400 focus-within:ring-4 focus-within:ring-sky-500/5 transition-all shadow-sm">
             <textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyPress}
               placeholder="Tracke dein Essen oder entlarve einen Mythos..."
-              className="flex-1 bg-transparent px-4 sm:px-6 py-3 sm:py-4 text-sm sm:text-base focus:outline-none resize-none placeholder:text-zinc-400 h-[52px] sm:h-[58px] max-h-32 text-zinc-800"
+              className="flex-1 bg-transparent px-4 sm:px-6 py-3 sm:py-4 text-[16px] sm:text-base focus:outline-none resize-none placeholder:text-zinc-400 h-[52px] sm:h-[58px] max-h-32 text-zinc-800"
               rows={1}
             />
             <button
