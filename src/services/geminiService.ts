@@ -86,7 +86,7 @@ export class GeminiService {
     }
     this.ai = new GoogleGenAI({ apiKey });
     this.chat = this.ai.chats.create({
-      model: "gemini-3.0-flash",
+      model: "gemini-3.1-pro-preview",
       config: {
         systemInstruction: SYSTEM_INSTRUCTION,
       },
