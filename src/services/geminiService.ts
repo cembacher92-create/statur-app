@@ -86,7 +86,7 @@ export class GeminiService {
     }
     this.ai = new GoogleGenAI({ apiKey });
     this.chat = this.ai.chats.create({
-      model: "gemini-3.1-pro-preview",
+      model: "gemini-2.5-flash",
       config: {
         systemInstruction: SYSTEM_INSTRUCTION,
       },
@@ -98,11 +98,15 @@ export class GeminiService {
       const result = await this.chat.sendMessage({ message });
       return result.text || "Keine Antwort erhalten.";
     } catch (error: any) {
-      console.error("Error sending message to Gemini:", error);
-      if (error.message?.includes("500") || error.message?.includes("INTERNAL")) {
-        return "Der STATUR-Server meldet einen internen Fehler. Dies ist meist ein temporäres Problem bei Google. Bitte versuche es in ein paar Sekunden erneut.";
+      console.error("Detailed Error sending message to Gemini:", error);
+      const errorMsg = error.message || "";
+      if (errorMsg.includes("429") || errorMsg.includes("QUOTA")) {
+        return "Das Tagesmaximum für die KI-Anfragen wurde erreicht. Bitte versuche es morgen erneut oder nutze einen anderen API-Key.";
       }
-      return "Fehler bei der Kommunikation mit der KI. Bitte versuche es später erneut.";
+      if (errorMsg.includes("500") || errorMsg.includes("INTERNAL")) {
+        return "Der STATUR-Server meldet einen internen Fehler. Bitte versuche es in ein paar Sekunden erneut.";
+      }
+      return `Fehler: ${errorMsg || "Kommunikation mit der KI fehlgeschlagen."}`;
     }
   }
 
@@ -113,11 +117,12 @@ export class GeminiService {
         yield (chunk as GenerateContentResponse).text || "";
       }
     } catch (error: any) {
-      console.error("Error streaming message from Gemini:", error);
-      if (error.message?.includes("500") || error.message?.includes("INTERNAL")) {
-        yield " [FEHLER: Interner Server-Fehler bei Google. Bitte Nachricht erneut senden.]";
+      console.error("Detailed Error streaming from Gemini:", error);
+      const errorMsg = error.message || "";
+      if (errorMsg.includes("429") || errorMsg.includes("QUOTA")) {
+        yield " [FEHLER: Tagesmaximum erreicht. Bitte morgen erneut versuchen.]";
       } else {
-        yield " [Fehler beim Streamen der Antwort.]";
+        yield ` [Fehler: ${errorMsg || "Stream unterbrochen"}]`;
       }
     }
   }
