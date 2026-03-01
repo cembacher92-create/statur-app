@@ -6,6 +6,13 @@
 }
 
 @layer base {
+  html, body {
+    @apply h-full w-full overflow-hidden;
+    touch-action: manipulation;
+  }
+  input, textarea, select {
+    font-size: 16px !important;
+  }
   body {
     @apply bg-[#fcfcfc] text-zinc-900;
   }
